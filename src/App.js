@@ -1,27 +1,30 @@
 import './App.css';
-//import Categorie from './Components/Categorie';
-import ProduitParCategorie from './Components/ProduitParCategorie';
-//import { useState, useEffect } from 'react';
+import ProtectedRoute from './ProtectedRoute';
+import AdminDashboard from './Administrateur/AdminDashboard';
+import Login from './Login';
+import {Routes, Route, Navigate} from "react-router-dom";
+import UserDashboard from './User/UserDashboard';
+import { getUserRole } from './Services/auth';
 
 function App() {
-
-  // const [cat, setCat] = useState([]);
-
-  // useEffect(() => {fetch('http://localhost:8000/api/categorie')
-  // .then(res => res.json())
-  // .then((data) => {
-  //   setCat(data);
-  //    console.log(data)
-  //   })
-  // .catch(error => console.log(error));
-  // }, []);
-  
-
   return (  
-    <div className='App'>
-      <h1 className='App'> Bienvenue à la ferme d'Epau</h1> 
-      <ProduitParCategorie />
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/" element={
+          getUserRole() === "USER" ? <UserDashboard /> : <Navigate to="/login" />
+        }
+      />
+      <Route path="/admin" element={
+          getUserRole() === "ADMIN" ? (
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          ) : (<Navigate to="/login" />)
+        }
+      />
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
+ 
   );
 }
 
